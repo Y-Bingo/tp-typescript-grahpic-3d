@@ -1,0 +1,6 @@
+﻿# DIRECTORY
+node_modules
+dist
+
+# FILE
+package-lock.json

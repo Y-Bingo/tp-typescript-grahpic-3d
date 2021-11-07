@@ -1,0 +1,21 @@
+{
+	"name": "typescript_grahpic_math_3d",
+	"version": "1.0.0",
+	"description": "typescrip 图形渲染实战，基于 WebGL 的 3D 架构与实现",
+	"main": "index.js",
+	"scripts": {
+		"dev": "webpack-dev-server",
+		"build": "webpack"
+	},
+	"author": "Bingo.Yang",
+	"license": "ISC",
+	"devDependencies": {
+		"html-webpack-plugin": "^5.5.0",
+		"ts-loader": "^9.2.6",
+		"typescript": "^4.4.4",
+		"webpack": "^5.62.1",
+		"webpack-cli": "^4.9.1",
+		"webpack-dev-server": "^4.4.0"
+	},
+	"dependencies": {}
+}
