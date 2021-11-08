@@ -1,4 +1,4 @@
-import { vec2 } from './math/vec2';
+import { vec2 } from '../math/vec2';
 
 export enum EInputEventType {
 	MOUSEEVENT, // 总类，表示鼠标事件

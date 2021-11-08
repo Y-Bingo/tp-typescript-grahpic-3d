@@ -1,6 +1,6 @@
-import { CanvasKeyBoardEvent, CanvasMouseEvent, EInputEventType } from './CanvasInputEvent';
+import { CanvasKeyBoardEvent, CanvasMouseEvent, EInputEventType } from './base/CanvasInputEvent';
+import { Timer, TimerCallback } from './base/Timer';
 import { vec2 } from './math/vec2';
-import { Timer, TimerCallback } from './Timer';
 
 export class Application implements EventListenerObject {
 	public timers: Timer[] = [];
