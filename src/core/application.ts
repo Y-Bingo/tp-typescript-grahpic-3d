@@ -1,4 +1,7 @@
-export class Application {
+import { CanvasKeyBoardEvent, CanvasMouseEvent, EInputEventType } from './CanvasInputEvent';
+import { vec2 } from './math/vec2';
+
+export class Application implements EventListenerObject {
 	public timers: number = -1;
 	private _timeId: number = -1;
 	private _fps: number = 0;
@@ -9,7 +12,7 @@ export class Application {
 	// 本书中的 Demo 以浏览器为主
 	// 我们对于 mouseEvent 事件提供一个开关变量
 	// 如果下面的变量设置为 true，则每次鼠标移动都会触发 mousemove 事件
-	public isSupportMouseEventMove: boolean;
+	public isSupportMouseMove: boolean;
 	// 我们使用下面变量来标记当前鼠标是否按下状态
 	// 目的是提供 mouseDrag 事件
 	protected _isMouseDown: Boolean;
@@ -26,9 +29,18 @@ export class Application {
 	public constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 		this._isMouseDown = false;
-		this.isSupportMouseEventMove = false;
+		this.isSupportMouseMove = false;
 		this.frameCallback = null;
 		document.oncontextmenu = () => {}; // 禁止右键菜单
+		// 事件绑定
+		// canvas 元素能监听鼠标事件
+		this.canvas.addEventListener('mousedown', this, false);
+		this.canvas.addEventListener('mouseup', this, false);
+		this.canvas.addEventListener('mousemove', this, false);
+		// 键盘事件只能在全局 window 对象中触发
+		window.addEventListener('keydown', this, false);
+		window.addEventListener('keyup', this, false);
+		window.addEventListener('keypress', this, false);
 	}
 
 	public start(): void {
@@ -84,6 +96,154 @@ export class Application {
 		requestAnimationFrame((msec: number) => {
 			this.step(msec);
 		});
+	}
+
+	/**
+	 * 将鼠标事件发生时鼠标指针的位置变换为相对当前 canvas 元素的偏移表示
+	 */
+	protected viewportToCanvasCoordinate(evt: MouseEvent): vec2 {
+		let rect: DOMRect = this.canvas.getBoundingClientRect();
+		if (evt.target) {
+			let x: number = evt.clientX - rect.left;
+			let y: number = 0;
+			y = evt.clientX - rect.top;
+			if (this.isFlipYCoord) {
+				y = this.canvas.height - y;
+			}
+			let pos: vec2 = new vec2(x, y);
+			return pos;
+		}
+		throw new Error(' evt.target is null ！');
+	}
+
+	/**
+	 * 将 event 对象信息转换为我们自己定义的 mouseEvent 事件
+	 */
+	private _isRightMouseDown: boolean = false;
+	private _toCanvasMouseEvent(evt: Event, type: EInputEventType): CanvasMouseEvent {
+		let event: MouseEvent = evt as MouseEvent;
+		if (type === EInputEventType.MOUSEDOWN && event.button === 2) {
+			this._isRightMouseDown = true;
+		} else if (type === EInputEventType.MOUSEUP && event.button === 2) {
+			this._isRightMouseDown = false;
+		}
+		let buttonNum: number = event.button;
+		if (this._isRightMouseDown && type === EInputEventType.MOUSEDRAG) {
+			buttonNum = 2;
+		}
+		let mousePosition: vec2 = this.viewportToCanvasCoordinate(event);
+		let canvasMouseEvent: CanvasMouseEvent = new CanvasMouseEvent(type, mousePosition, buttonNum, event.altKey, event.ctrlKey, event.shiftKey);
+		return canvasMouseEvent;
+	}
+
+	/**
+	 * 将 event 对象信息转换为我们自己定义的 keyboard 事件
+	 */
+	private _toCanvasKeyBoardEvent(evt: Event, type: EInputEventType): CanvasKeyBoardEvent {
+		let event: KeyboardEvent = evt as KeyboardEvent;
+		let canvasKeyBoardEvent: CanvasKeyBoardEvent = new CanvasKeyBoardEvent(
+			type,
+			event.key,
+			event.keyCode,
+			event.repeat,
+			event.altKey,
+			event.ctrlKey,
+			event.shiftKey,
+		);
+		return canvasKeyBoardEvent;
+	}
+
+	public handleEvent(evt: Event): void {
+		switch (evt.type) {
+			case 'mousedown':
+				this._isMouseDown = true;
+				this.dispatchMouseDown(this._toCanvasMouseEvent(evt, EInputEventType.MOUSEDOWN));
+				break;
+			case 'mouseup':
+				this._isMouseDown = false;
+				this.dispatchMouseUp(this._toCanvasMouseEvent(evt, EInputEventType.MOUSEUP));
+				break;
+			case 'mousemove':
+				if (this.isSupportMouseMove) {
+					this.dispatchMouseMove(this._toCanvasMouseEvent(evt, EInputEventType.MOUSEMOVE));
+				}
+				if (this._isMouseDown) {
+					this.dispatchMouseDrag(this._toCanvasMouseEvent(evt, EInputEventType.MOUSEDRAG));
+				}
+				break;
+			case 'keypress':
+				this.dispatchKeyPress(this._toCanvasKeyBoardEvent(evt, EInputEventType.KEYPRESS));
+				break;
+			case 'keydown':
+				this.dispatchKeyDown(this._toCanvasKeyBoardEvent(evt, EInputEventType.KEYDOWN));
+				break;
+			case 'keyup':
+				this.dispatchKeyUp(this._toCanvasKeyBoardEvent(evt, EInputEventType.KEYUP));
+				break;
+		}
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchMouseDown(evt: CanvasMouseEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchMouseUp(evt: CanvasMouseEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchMouseMove(evt: CanvasMouseEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchMouseDrag(evt: CanvasMouseEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchKeyDown(evt: CanvasKeyBoardEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchKeyUp(evt: CanvasKeyBoardEvent): void {
+		return;
+	}
+
+	/**
+	 * 虚方法，子类需要覆写
+	 * @param evt 事件对象
+	 * @returns
+	 */
+	protected dispatchKeyPress(evt: CanvasKeyBoardEvent): void {
+		return;
 	}
 
 	/**
