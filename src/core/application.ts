@@ -1,8 +1,9 @@
 import { CanvasKeyBoardEvent, CanvasMouseEvent, EInputEventType } from './CanvasInputEvent';
 import { vec2 } from './math/vec2';
+import { Timer, TimerCallback } from './Timer';
 
 export class Application implements EventListenerObject {
-	public timers: number = -1;
+	public timers: Timer[] = [];
 	private _timeId: number = -1;
 	private _fps: number = 0;
 	public isFlipYCoord: boolean = false;
@@ -41,6 +42,59 @@ export class Application implements EventListenerObject {
 		window.addEventListener('keydown', this, false);
 		window.addEventListener('keyup', this, false);
 		window.addEventListener('keypress', this, false);
+	}
+
+	public addTimer(callback: TimerCallback, timeout: number = 1.0, onlyOnce: boolean = false, data: any = undefined): number {
+		let timer: Timer;
+		let found: boolean = false;
+		for (let i = 0; i < this.timers.length; i++) {
+			let timer: Timer = this.timers[i];
+			if (timer.enabled === false) {
+				timer.callback = callback;
+				timer.callbackData = data;
+				timer.timeout = timeout;
+				timer.countdown = timeout;
+				timer.enabled = true;
+				timer.onlyOnce = onlyOnce;
+				return timer.id;
+			}
+		}
+		timer = new Timer(callback);
+		timer.callbackData = data;
+		timer.timeout = timeout;
+		timer.countdown = timeout;
+		timer.enabled = true;
+		timer.id = ++this._timeId;
+		timer.onlyOnce = onlyOnce;
+		this.timers.push(timer);
+		return timer.id;
+	}
+
+	public removeTimer(id: number): boolean {
+		let found: boolean = false;
+		for (let i = 0; i < this.timers.length; i++) {
+			let timer: Timer = this.timers[i];
+			timer.enabled = false;
+			found = true;
+			break;
+		}
+		return found;
+	}
+
+	private _handleTimers(intervalSec: number): void {
+		for (let i = 0; i < this.timers.length; i++) {
+			let timer: Timer = this.timers[i];
+			if (timer.enabled === false) continue;
+			timer.countdown -= intervalSec;
+			if (timer.countdown < 0.0) {
+				timer.callback(timer.id, timer.callbackData);
+				if (timer.onlyOnce === false) {
+					timer.countdown = timer.timeout;
+				} else {
+					this.removeTimer(timer.id);
+				}
+			}
+		}
 	}
 
 	public start(): void {
@@ -84,7 +138,7 @@ export class Application implements EventListenerObject {
 		intervalSec /= 1000.0;
 		this._lastTime = timestamp;
 		// 计时处理
-		// this._handleTimers(intervalSec);
+		this._handleTimers(intervalSec);
 		// 先更新
 		this.update(elapseMsec, intervalSec);
 		// 后渲染
