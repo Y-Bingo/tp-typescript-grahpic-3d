@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>TypeScript 图形渲染实战 - 3D 架构设计与实现</title>
+		<title></title>
 		<style>
 			body {
 				background: #eee;
@@ -15,10 +15,38 @@
 				-moz-box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
 				box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
 			}
+			.contain {
+				position: relative;
+			}
+			#overlay {
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				background-color: rgba(0, 0, 0, 0.7);
+				color: white;
+				font-family: monospace;
+				padding: 1em;
+			}
 		</style>
 	</head>
-
 	<body>
-		<canvas id="canvas" width="800" height="600"></canvas>
+		<select name="" id="select"></select>
+		<div class="contain">
+			<canvas id="canvas" width="800" height="600" style="background: lightgray"></canvas>
+			<div id="overlay">
+				<div>
+					FPS:
+					<span id="fps"></span>
+				</div>
+				<div>
+					Tris:
+					<span id="tris"></span>
+				</div>
+				<div>
+					Verts:
+					<span id="verts"></span>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>

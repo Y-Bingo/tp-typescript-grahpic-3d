@@ -25,7 +25,14 @@ module.exports = {
 			},
 		],
 	},
-	plugins: [new HtmlWebpackPlugin({})],
+	plugins: [
+		new HtmlWebpackPlugin({
+			title: 'TypeScript 图形渲染实战 - 3D 架构设计与实现',
+			filename: 'index.html',
+			template: './index.html',
+			inject: 'body',
+		}),
+	],
 	devServer: {
 		compress: true,
 		host: 'localhost',
