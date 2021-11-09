@@ -1,6 +1,7 @@
+import { AsyncLoadTextApplication } from './applicaiton/AysncLoadTestApplicaiton';
 import { Application } from './core/application';
 
-let appNames: string[] = ['webgl hello world'];
+let appNames: string[] = ['AsyncLoadTextApplication'];
 let select: HTMLSelectElement = document.getElementById('select') as HTMLSelectElement;
 let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -36,6 +37,8 @@ select.onchange = (): void => {
 	if (canvas === null) return;
 	switch (select.selectedIndex) {
 		case 0:
+			let app: AsyncLoadTextApplication = new AsyncLoadTextApplication(canvas);
+			app.run();
 			break;
 	}
 };
