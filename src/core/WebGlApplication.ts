@@ -1,7 +1,7 @@
 import { Application } from './application';
 
 export class WebGLApplication extends Application {
-	public gl: WebGLRenderingContext; // 操作 webgl 上下文
+	public gl: WebGLRenderingContext | null = null; // 操作 webgl 上下文
 	// public matStack: GLWorldMatrixStack; //
 	// public builder: GLMeshBuilder; //
 	protected canvas2D: HTMLCanvasElement | null = null;

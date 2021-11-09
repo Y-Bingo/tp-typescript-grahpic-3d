@@ -44,6 +44,10 @@ export class Application implements EventListenerObject {
 		window.addEventListener('keypress', this, false);
 	}
 
+	public get fps() {
+		return this._fps;
+	}
+
 	public addTimer(callback: TimerCallback, timeout: number = 1.0, onlyOnce: boolean = false, data: any = undefined): number {
 		let timer: Timer;
 		let found: boolean = false;

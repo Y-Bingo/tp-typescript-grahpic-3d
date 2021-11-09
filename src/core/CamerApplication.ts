@@ -1,4 +1,5 @@
 import { CanvasKeyBoardEvent } from './base/CanvasInputEvent';
+import { Camera } from './Carmera';
 import { WebGLApplication } from './WebGlApplication';
 
 export class CameraApplication extends WebGLApplication {
