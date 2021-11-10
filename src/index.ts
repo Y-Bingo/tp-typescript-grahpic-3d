@@ -1,7 +1,8 @@
 import { AsyncLoadTextApplication } from './applicaiton/AysncLoadTestApplicaiton';
+import { BasicWebGLApplication } from './applicaiton/BaseWebGLApplication';
 import { Application } from './core/application';
 
-let appNames: string[] = ['AsyncLoadTextApplication'];
+let appNames: string[] = ['AsyncLoadTextApplication', 'BasicWebGLApplication'];
 let select: HTMLSelectElement = document.getElementById('select') as HTMLSelectElement;
 let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -35,11 +36,12 @@ function frameCallback(app: Application): void {
 
 select.onchange = (): void => {
 	if (canvas === null) return;
-	switch (select.selectedIndex) {
-		case 0:
-			let app: AsyncLoadTextApplication = new AsyncLoadTextApplication(canvas);
-			app.run();
-			break;
+	if (select.selectedIndex === 0) {
+		let app: AsyncLoadTextApplication = new AsyncLoadTextApplication(canvas);
+		app.run();
+	} else if (select.selectedIndex === 1) {
+		let app: BasicWebGLApplication = new BasicWebGLApplication(canvas);
+		app.run();
 	}
 };
 
